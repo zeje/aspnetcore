@@ -5,7 +5,6 @@
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <Compile Include="Microsoft.Extensions.Identity.Core.netstandard2.0.cs" />
-    <Compile Include="Microsoft.Extensions.Identity.Core.Manual.cs" />
     <Compile Include="../src/Properties/AssemblyInfo.cs" />
     <Reference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" />
     <Reference Include="Microsoft.Extensions.Logging" />
@@ -13,7 +12,6 @@
   </ItemGroup>
 <ItemGroup Condition="'$(TargetFramework)' == '$(DefaultNetCoreTargetFramework)'">
     <Compile Include="Microsoft.Extensions.Identity.Core.netcoreapp.cs" />
-    <Compile Include="Microsoft.Extensions.Identity.Core.Manual.cs" />
     <Compile Include="../src/Properties/AssemblyInfo.cs" />
     <Reference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" />
     <Reference Include="Microsoft.Extensions.Logging" />
