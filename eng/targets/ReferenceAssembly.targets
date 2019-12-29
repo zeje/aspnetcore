@@ -65,9 +65,9 @@
 
     <PropertyGroup>
       <_GenApiFile>$([MSBuild]::NormalizePath('$(ArtifactsDir)', 'log', 'GenAPI.rsp'))</_GenApiFile>
+      <_GenAPICommand>"C:\dd\dnx\Universe++\arcade\artifacts\bin\Microsoft.DotNet.GenAPI\Debug\net472\Microsoft.DotNet.GenAPI.exe"</_GenAPICommand>
       <_GenAPICommand
-          Condition="'$(MSBuildRuntimeType)' == 'core'">"$(DotNetTool)" --roll-forward-on-no-candidate-fx 2 "$(_GenAPIPath)"</_GenAPICommand>
-      <_GenAPICmd>$(_GenAPICommand)</_GenAPICmd>
+          Condition="'$(MSBuildRuntimeType)' == 'core'">"$(DotNetTool)" --roll-forward-on-no-candidate-fx 2 "C:\dd\dnx\Universe++\arcade\artifacts\bin\Microsoft.DotNet.GenAPI\Debug\netcoreapp2.1\Microsoft.DotNet.GenAPI.dll"</_GenAPICommand>
       <_GenAPICmd>$(_GenAPICommand) @"$(_GenApiFile)"</_GenAPICmd>
       <_GenAPICmd
           Condition=" '$(AdditionalGenApiCmdOptions)' != '' ">$(_GenAPICmd) $(AdditionalGenApiCmdOptions)</_GenAPICmd>
