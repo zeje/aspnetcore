@@ -5,7 +5,7 @@ namespace Microsoft.AspNetCore.Builder
 {
     public sealed partial class HubEndpointConventionBuilder : Microsoft.AspNetCore.Builder.IEndpointConventionBuilder, Microsoft.AspNetCore.Builder.IHubEndpointConventionBuilder
     {
-        internal HubEndpointConventionBuilder() { }
+        private HubEndpointConventionBuilder() { }
         public void Add(System.Action<Microsoft.AspNetCore.Builder.EndpointBuilder> convention) { }
     }
     public static partial class HubEndpointRouteBuilderExtensions
