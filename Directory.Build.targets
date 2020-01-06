@@ -119,6 +119,26 @@
     <AssemblyVersion>$(AspNetCoreMajorVersion).$(AspNetCoreMinorVersion).0.0</AssemblyVersion>
   </PropertyGroup>
 
+  <PropertyGroup Label="ApiCompat settings">
+    <!-- Don't run ApiCompat on projects without ref assemblies -->
+    <RunApiCompat Condition=" ! $(HasReferenceAssembly) ">false</RunApiCompat>
+    <!-- Only run ApiCompat on Windows -->
+    <RunApiCompat Condition="'$(TargetOsName)' != 'win'">false</RunApiCompat>
+    <!-- Only run ApiCompat in inner builds when multi-targeting. -->
+    <RunApiCompat Condition=" '$(TargetFramework)' == '' ">false</RunApiCompat>
+
+    <BaselineAllAPICompatError Condition=" '$(BaselineAllAPICompatError)' == '' ">false</BaselineAllAPICompatError>
+  </PropertyGroup>
+
+  <Target Name="HackApiCompatPath"
+      Condition=" $(HasReferenceAssembly) "
+      BeforeTargets="ValidateApiCompatForSrc"
+      DependsOnTargets="ResolveProjectReferences">
+    <ItemGroup>
+      <ResolvedMatchingContract Include="@(ReferenceProjectMetadata)" />
+    </ItemGroup>
+  </Target>
+
   <ItemGroup>
     <KnownFrameworkReference Update="Microsoft.NETCore.App">
       <!-- Always update the 'latest version', whether the repo is servicing or not. -->
