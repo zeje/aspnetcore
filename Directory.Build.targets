@@ -120,6 +120,8 @@
   </PropertyGroup>
 
   <PropertyGroup Label="ApiCompat settings">
+    <AdditionalApiCompatCmdOptions>--respect-internals</AdditionalApiCompatCmdOptions>
+
     <!-- Don't run ApiCompat on projects without ref assemblies -->
     <RunApiCompat Condition=" ! $(HasReferenceAssembly) ">false</RunApiCompat>
     <!-- Only run ApiCompat on Windows -->
@@ -134,6 +136,16 @@
       Condition=" $(HasReferenceAssembly) "
       BeforeTargets="ValidateApiCompatForSrc"
       DependsOnTargets="ResolveProjectReferences">
+    <PropertyGroup>
+      <_ApiCompatPath
+          Condition="'$(MSBuildRuntimeType)' == 'core'">C:\dd\dnx\Universe++\arcade\artifacts\bin\Microsoft.DotNet.ApiCompat\Debug\netcoreapp2.1\Microsoft.DotNet.ApiCompat.dll</_ApiCompatPath>
+      <_ApiCompatPath
+          Condition="'$(MSBuildRuntimeType)' != 'core'">C:\dd\dnx\Universe++\arcade\artifacts\bin\Microsoft.DotNet.ApiCompat\Debug\net472\Microsoft.DotNet.ApiCompat.exe</_ApiCompatPath>
+      <_ApiCompatCommand
+          Condition="'$(MSBuildRuntimeType)' == 'core'">"$(DotNetTool)" "$(_ApiCompatPath)"</_ApiCompatCommand>
+      <_ApiCompatCommand
+          Condition="'$(MSBuildRuntimeType)' != 'core' and '$(OS)' == 'Windows_NT'">"$(_ApiCompatPath)"</_ApiCompatCommand>
+    </PropertyGroup>
     <ItemGroup>
       <ResolvedMatchingContract Include="@(ReferenceProjectMetadata)" />
     </ItemGroup>
