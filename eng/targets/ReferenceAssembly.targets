@@ -12,9 +12,10 @@
       <_DeduplicatedTargetFramework Include="%(_AllTargetFrameworks.Identity)" />
     </ItemGroup>
 
+    <!-- !!! Why is RunApiCompat=false needed to avoid 15 errors e.g. in Microsoft.AspNetCore.Components.csproj? -->
     <MSBuild Projects="$(MSBuildProjectFullPath)"
         Targets="_GenerateProjectSourceInner"
-        Properties="TargetFramework=%(_DeduplicatedTargetFramework.Identity);CompileUsingReferenceAssemblies=false">
+        Properties="TargetFramework=%(_DeduplicatedTargetFramework.Identity);CompileUsingReferenceAssemblies=false;RunApiCompat=false">
       <Output TaskParameter="TargetOutputs" ItemName="ProjectListContentItem" />
     </MSBuild>
 
