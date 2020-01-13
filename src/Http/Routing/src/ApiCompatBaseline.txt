@@ -1,0 +1,5 @@
+Compat issues with assembly Microsoft.AspNetCore.Routing:
+CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'Microsoft.AspNetCore.Routing.HostAttribute' changed from '[AttributeUsageAttribute(68, AllowMultiple=false, Inherited=false)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple=false, Inherited=false)]' in the implementation.
+CannotSealType : Type 'Microsoft.AspNetCore.Routing.Patterns.RoutePatternPart' is effectively (has a private constructor) sealed in the implementation but not sealed in the contract.
+CannotMakeMemberNonVirtual : Member 'Microsoft.AspNetCore.Routing.Patterns.RoutePatternPart.DebuggerToString()' is non-virtual in the implementation but is virtual in the contract.
+Total Issues: 3

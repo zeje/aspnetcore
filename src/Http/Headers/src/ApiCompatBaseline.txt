@@ -1,0 +1,4 @@
+Compat issues with assembly Microsoft.Net.Http.Headers:
+MembersMustExist : Member 'Microsoft.Net.Http.Headers.MediaTypeHeaderValueComparer..ctor()' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'Microsoft.Net.Http.Headers.StringWithQualityHeaderValueComparer..ctor()' does not exist in the implementation but it does exist in the contract.
+Total Issues: 2

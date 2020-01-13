@@ -1,0 +1,4 @@
+Compat issues with assembly Microsoft.AspNetCore.Http.Connections:
+CannotChangeAttribute : Attribute 'System.Diagnostics.Tracing.EventAttribute' on 'Microsoft.AspNetCore.Http.Connections.Internal.HttpConnectionsEventSource.ConnectionStart(System.String)' changed from '[EventAttribute(1, Level=4, Message="Started connection '{0}'.")]' in the contract to '[EventAttribute(1, Level=EventLevel.Informational, Message="Started connection '{0}'.")]' in the implementation.
+CannotChangeAttribute : Attribute 'System.Diagnostics.Tracing.EventAttribute' on 'Microsoft.AspNetCore.Http.Connections.Internal.HttpConnectionsEventSource.ConnectionTimedOut(System.String)' changed from '[EventAttribute(3, Level=4, Message="Connection '{0}' timed out.")]' in the contract to '[EventAttribute(3, Level=EventLevel.Informational, Message="Connection '{0}' timed out.")]' in the implementation.
+Total Issues: 2

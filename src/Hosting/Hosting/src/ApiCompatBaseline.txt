@@ -1,0 +1,7 @@
+Compat issues with assembly Microsoft.AspNetCore.Hosting:
+CannotChangeAttribute : Attribute 'System.Diagnostics.Tracing.EventAttribute' on 'Microsoft.AspNetCore.Hosting.HostingEventSource.HostStart()' changed from '[EventAttribute(1, Level=4)]' in the contract to '[EventAttribute(1, Level=EventLevel.Informational)]' in the implementation.
+CannotChangeAttribute : Attribute 'System.Diagnostics.Tracing.EventAttribute' on 'Microsoft.AspNetCore.Hosting.HostingEventSource.HostStop()' changed from '[EventAttribute(2, Level=4)]' in the contract to '[EventAttribute(2, Level=EventLevel.Informational)]' in the implementation.
+CannotChangeAttribute : Attribute 'System.Diagnostics.Tracing.EventAttribute' on 'Microsoft.AspNetCore.Hosting.HostingEventSource.RequestStart(System.String, System.String)' changed from '[EventAttribute(3, Level=4)]' in the contract to '[EventAttribute(3, Level=EventLevel.Informational)]' in the implementation.
+CannotChangeAttribute : Attribute 'System.Diagnostics.Tracing.EventAttribute' on 'Microsoft.AspNetCore.Hosting.HostingEventSource.RequestStop()' changed from '[EventAttribute(4, Level=4)]' in the contract to '[EventAttribute(4, Level=EventLevel.Informational)]' in the implementation.
+CannotChangeAttribute : Attribute 'System.Diagnostics.Tracing.EventAttribute' on 'Microsoft.AspNetCore.Hosting.HostingEventSource.UnhandledException()' changed from '[EventAttribute(5, Level=2)]' in the contract to '[EventAttribute(5, Level=EventLevel.Error)]' in the implementation.
+Total Issues: 5

@@ -1,0 +1,4 @@
+Compat issues with assembly Microsoft.AspNetCore.Mvc.Abstractions:
+MembersMustExist : Member 'Microsoft.AspNetCore.Mvc.Formatters.InputFormatterResult..ctor()' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'Microsoft.AspNetCore.Mvc.ModelBinding.CompositeBindingSource..ctor()' does not exist in the implementation but it does exist in the contract.
+Total Issues: 2
