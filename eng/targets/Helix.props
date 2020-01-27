@@ -14,7 +14,7 @@
     <HelixTimeout>00:30:00</HelixTimeout>
     <IsWindowsHelixQueue>false</IsWindowsHelixQueue>
     <IsWindowsHelixQueue Condition="$(HelixTargetQueue.Contains('Windows')) or $(HelixTargetQueue.Contains('windows'))">true</IsWindowsHelixQueue>
-    <HelixTestName>$(MSBuildProjectName)-$(TargetFramework)</HelixTestName>
+    <HelixTestName>aspnetcore/$(MSBuildProjectName)/$(TargetFramework)</HelixTestName>
     <HelixUseArchive>false</HelixUseArchive>
     <LoggingTestingDisableFileLogging Condition="'$(IsHelixJob)' == 'true'">false</LoggingTestingDisableFileLogging>
     <NodeVersion>10.15.3</NodeVersion>

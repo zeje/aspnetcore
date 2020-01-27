@@ -4,7 +4,7 @@
   <ItemGroup Condition="$(BuildHelixPayload)">
     <Content Include="@(HelixContent)" />
   </ItemGroup>
-  
+
 <!--
 
 This target is meant to be used when invoking helix tests on one project at a time.
@@ -48,8 +48,9 @@ Usage: dotnet msbuild /t:Helix src/MyTestProject.csproj
     </ItemGroup>
 
     <PropertyGroup>
-      <BuildHelixPayload Condition="'@(_HelixApplicableTargetQueue->Count())' == '0'">false</BuildHelixPayload>
-      <BuildHelixPayload Condition="'$(TargetArchitecture)' == 'arm64' AND '$(SkipHelixArm)' == 'true'">false</BuildHelixPayload>
+      <!-- We allow the outside caller to set BuildHelixPayload to force it to be used -->
+      <BuildHelixPayload Condition="'$(BuildHelixPayload)' == '' AND '@(_HelixApplicableTargetQueue->Count())' == '0'">false</BuildHelixPayload>
+      <BuildHelixPayload Condition="'$(BuildHelixPayload)' == '' AND '$(TargetArchitecture)' == 'arm64' AND '$(SkipHelixArm)' == 'true'">false</BuildHelixPayload>
     </PropertyGroup>
   </Target>
 
@@ -71,6 +72,7 @@ Usage: dotnet msbuild /t:Helix src/MyTestProject.csproj
       <_HelixFriendlyNameTargetQueue Condition="$(HelixTargetQueue.Contains('@'))">$(HelixTargetQueue.Substring(1, $([MSBuild]::Subtract($(HelixTargetQueue.LastIndexOf(')')), 1))))</_HelixFriendlyNameTargetQueue>
     </PropertyGroup>
 
+    <Message Text="Preparing Helix Payload for $(_HelixFriendlyNameTargetQueue) ..." Importance="high" />
     <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="_PublishHelixArchive" RemoveProperties="HelixTargetQueue;TestRunId" />
 
     <ConvertToAbsolutePath Paths="$(PublishDir)">
