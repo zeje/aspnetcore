@@ -70,7 +70,7 @@ namespace Microsoft.AspNetCore.Http.Connections
     internal static partial class ServerSentEventsMessageFormatter
     {
         [System.Diagnostics.DebuggerStepThroughAttribute]
-        public static System.Threading.Tasks.Task WriteMessageAsync(System.Buffers.ReadOnlySequence<byte> payload, System.IO.Stream output) { throw null; }
+        public static System.Threading.Tasks.Task WriteMessageAsync(System.Buffers.ReadOnlySequence<byte> payload, System.IO.Stream output, System.Threading.CancellationToken token) { throw null; }
     }
     public partial class WebSocketOptions
     {
@@ -121,6 +121,7 @@ namespace Microsoft.AspNetCore.Http.Connections.Internal
         public System.DateTime LastSeenUtc { get { throw null; } set { } }
         public System.DateTime? LastSeenUtcIfInactive { get { throw null; } }
         public System.Threading.Tasks.Task PreviousPollTask { get { throw null; } set { } }
+        internal System.Threading.CancellationToken SendingToken { get { throw null; } }
         public Microsoft.AspNetCore.Http.Connections.Internal.HttpConnectionStatus Status { get { throw null; } set { } }
         public Microsoft.AspNetCore.Connections.TransferFormat SupportedFormats { get { throw null; } set { } }
         public override System.IO.Pipelines.IDuplexPipe Transport { get { throw null; } set { } }
@@ -134,9 +135,12 @@ namespace Microsoft.AspNetCore.Http.Connections.Internal
         public System.Threading.Tasks.Task DisposeAsync(bool closeGracefully = false) { throw null; }
         public void MarkInactive() { }
         public void OnHeartbeat(System.Action<object> action, object state) { }
+        internal void StartSendCancellation() { }
+        internal void StopSendCancellation() { }
         public void TickHeartbeat() { }
         public bool TryActivateLongPollingConnection(Microsoft.AspNetCore.Connections.ConnectionDelegate connectionDelegate, Microsoft.AspNetCore.Http.HttpContext nonClonedContext, System.TimeSpan pollTimeout, System.Threading.Tasks.Task currentRequestTask, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory, Microsoft.Extensions.Logging.ILogger dispatcherLogger) { throw null; }
         internal bool TryActivatePersistentConnection(Microsoft.AspNetCore.Connections.ConnectionDelegate connectionDelegate, Microsoft.AspNetCore.Http.Connections.Internal.Transports.IHttpTransport transport, Microsoft.Extensions.Logging.ILogger dispatcherLogger) { throw null; }
+        internal void TryCancelSend(long currentTicks) { }
     }
     internal partial class HttpConnectionDispatcher
     {
@@ -208,11 +212,13 @@ namespace Microsoft.AspNetCore.Http.Connections.Internal.Transports
     internal partial class LongPollingServerTransport : Microsoft.AspNetCore.Http.Connections.Internal.Transports.IHttpTransport
     {
         public LongPollingServerTransport(System.Threading.CancellationToken timeoutToken, System.IO.Pipelines.PipeReader application, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory) { }
+        public LongPollingServerTransport(System.Threading.CancellationToken timeoutToken, System.IO.Pipelines.PipeReader application, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory, Microsoft.AspNetCore.Http.Connections.Internal.HttpConnectionContext connection) { }
         [System.Diagnostics.DebuggerStepThroughAttribute]
         public System.Threading.Tasks.Task ProcessRequestAsync(Microsoft.AspNetCore.Http.HttpContext context, System.Threading.CancellationToken token) { throw null; }
     }
     internal partial class ServerSentEventsServerTransport : Microsoft.AspNetCore.Http.Connections.Internal.Transports.IHttpTransport
     {
+        public ServerSentEventsServerTransport(System.IO.Pipelines.PipeReader application, string connectionId, Microsoft.AspNetCore.Http.Connections.Internal.HttpConnectionContext connection, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory) { }
         public ServerSentEventsServerTransport(System.IO.Pipelines.PipeReader application, string connectionId, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory) { }
         [System.Diagnostics.DebuggerStepThroughAttribute]
         public System.Threading.Tasks.Task ProcessRequestAsync(Microsoft.AspNetCore.Http.HttpContext context, System.Threading.CancellationToken token) { throw null; }
@@ -382,5 +388,24 @@ namespace System.Net.WebSockets
     internal static partial class WebSocketExtensions
     {
         public static System.Threading.Tasks.ValueTask SendAsync(this System.Net.WebSockets.WebSocket webSocket, System.Buffers.ReadOnlySequence<byte> buffer, System.Net.WebSockets.WebSocketMessageType webSocketMessageType, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
+    }
+}
+namespace System.Threading.Tasks
+{
+    internal readonly partial struct NoThrowAwaiter : System.Runtime.CompilerServices.ICriticalNotifyCompletion, System.Runtime.CompilerServices.INotifyCompletion
+    {
+        private readonly object _dummy;
+        private readonly int _dummyPrimitive;
+        public NoThrowAwaiter(System.Threading.Tasks.Task task) { throw null; }
+        public bool IsCompleted { get { throw null; } }
+        public System.Threading.Tasks.NoThrowAwaiter GetAwaiter() { throw null; }
+        public void GetResult() { }
+        public void OnCompleted(System.Action continuation) { }
+        public void UnsafeOnCompleted(System.Action continuation) { }
+    }
+    internal static partial class TaskExtensions
+    {
+        [System.Diagnostics.DebuggerStepThroughAttribute]
+        public static System.Threading.Tasks.Task NoThrow(this System.Threading.Tasks.Task task) { throw null; }
     }
 }

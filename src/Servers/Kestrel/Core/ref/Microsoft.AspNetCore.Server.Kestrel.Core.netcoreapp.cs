@@ -17,9 +17,11 @@ namespace Microsoft.AspNetCore.Certificates.Generation
         public Microsoft.AspNetCore.Certificates.Generation.CertificateManager.DiagnosticInformation CleanupHttpsCertificates2(string subject = "CN=localhost") { throw null; }
         public System.Security.Cryptography.X509Certificates.X509Certificate2 CreateAspNetCoreHttpsDevelopmentCertificate(System.DateTimeOffset notBefore, System.DateTimeOffset notAfter, string subjectOverride, Microsoft.AspNetCore.Certificates.Generation.CertificateManager.DiagnosticInformation diagnostics = null) { throw null; }
         public System.Security.Cryptography.X509Certificates.X509Certificate2 CreateSelfSignedCertificate(System.Security.Cryptography.X509Certificates.X500DistinguishedName subject, System.Collections.Generic.IEnumerable<System.Security.Cryptography.X509Certificates.X509Extension> extensions, System.DateTimeOffset notBefore, System.DateTimeOffset notAfter) { throw null; }
-        public Microsoft.AspNetCore.Certificates.Generation.CertificateManager.DetailedEnsureCertificateResult EnsureAspNetCoreHttpsDevelopmentCertificate(System.DateTimeOffset notBefore, System.DateTimeOffset notAfter, string path = null, bool trust = false, bool includePrivateKey = false, string password = null, string subject = "CN=localhost") { throw null; }
-        public Microsoft.AspNetCore.Certificates.Generation.CertificateManager.DetailedEnsureCertificateResult EnsureValidCertificateExists(System.DateTimeOffset notBefore, System.DateTimeOffset notAfter, Microsoft.AspNetCore.Certificates.Generation.CertificatePurpose purpose, string path, bool trust, bool includePrivateKey, string password, string subject) { throw null; }
+        public Microsoft.AspNetCore.Certificates.Generation.CertificateManager.DetailedEnsureCertificateResult EnsureAspNetCoreHttpsDevelopmentCertificate(System.DateTimeOffset notBefore, System.DateTimeOffset notAfter, string path = null, bool trust = false, bool includePrivateKey = false, string password = null, string subject = "CN=localhost", bool isInteractive = true) { throw null; }
+        public Microsoft.AspNetCore.Certificates.Generation.CertificateManager.DetailedEnsureCertificateResult EnsureValidCertificateExists(System.DateTimeOffset notBefore, System.DateTimeOffset notAfter, Microsoft.AspNetCore.Certificates.Generation.CertificatePurpose purpose, string path = null, bool trust = false, bool includePrivateKey = false, string password = null, string subjectOverride = null, bool isInteractive = true) { throw null; }
         public void ExportCertificate(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate, string path, bool includePrivateKey, string password, Microsoft.AspNetCore.Certificates.Generation.CertificateManager.DiagnosticInformation diagnostics = null) { }
+        public System.Collections.Generic.IList<System.Security.Cryptography.X509Certificates.X509Certificate2> GetHttpsCertificates() { throw null; }
+        internal bool HasValidCertificateWithInnaccessibleKeyAcrossPartitions() { throw null; }
         public static bool IsHttpsDevelopmentCertificate(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate) { throw null; }
         public bool IsTrusted(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate) { throw null; }
         public static System.Collections.Generic.IList<System.Security.Cryptography.X509Certificates.X509Certificate2> ListCertificates(Microsoft.AspNetCore.Certificates.Generation.CertificatePurpose purpose, System.Security.Cryptography.X509Certificates.StoreName storeName, System.Security.Cryptography.X509Certificates.StoreLocation location, bool isValid, bool requireExportable = true, Microsoft.AspNetCore.Certificates.Generation.CertificateManager.DiagnosticInformation diagnostics = null) { throw null; }
@@ -57,6 +59,7 @@ namespace Microsoft.AspNetCore.Certificates.Generation
         ErrorExportingTheCertificate = 5,
         FailedToTrustTheCertificate = 6,
         UserCancelledTrustStep = 7,
+        FailedToMakeKeyAccessible = 8,
     }
 }
 namespace Microsoft.AspNetCore.Hosting

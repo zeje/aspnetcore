@@ -150,10 +150,12 @@ namespace Microsoft.AspNetCore.SignalR
         public string UserIdentifier { get { throw null; } set { } }
         public virtual void Abort() { }
         internal System.Threading.Tasks.Task AbortAsync() { throw null; }
+        internal void BeginClientTimeout() { }
         [System.Diagnostics.DebuggerStepThroughAttribute]
         internal System.Threading.Tasks.Task<bool> HandshakeAsync(System.TimeSpan timeout, System.Collections.Generic.IReadOnlyList<string> supportedProtocols, Microsoft.AspNetCore.SignalR.IHubProtocolResolver protocolResolver, Microsoft.AspNetCore.SignalR.IUserIdProvider userIdProvider, bool enableDetailedErrors) { throw null; }
         internal void ResetClientTimeout() { }
         internal void StartClientTimeout() { }
+        internal void StopClientTimeout() { }
         public virtual System.Threading.Tasks.ValueTask WriteAsync(Microsoft.AspNetCore.SignalR.Protocol.HubMessage message, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
         public virtual System.Threading.Tasks.ValueTask WriteAsync(Microsoft.AspNetCore.SignalR.SerializedHubMessage message, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
     }
