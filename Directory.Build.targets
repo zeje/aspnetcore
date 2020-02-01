@@ -126,8 +126,8 @@
     <RunApiCompat Condition=" ! $(HasReferenceAssembly) ">false</RunApiCompat>
     <!-- Only run ApiCompat on Windows -->
     <RunApiCompat Condition="'$(TargetOsName)' != 'win'">false</RunApiCompat>
-    <!-- Only run ApiCompat in inner builds when multi-targeting. -->
-    <RunApiCompat Condition=" '$(TargetFramework)' == '' ">false</RunApiCompat>
+    <!-- Only run ApiCompat in inner builds when multi-targeting for the default TFM. -->
+    <RunApiCompat Condition=" '$(TargetFramework)' != '$(DefaultNetCoreTargetFramework)' ">false</RunApiCompat>
 
     <BaselineAllAPICompatError Condition=" '$(BaselineAllAPICompatError)' == '' ">false</BaselineAllAPICompatError>
   </PropertyGroup>
@@ -143,8 +143,7 @@
           Condition="'$(MSBuildRuntimeType)' != 'core'">C:\dd\dnx\Universe++\arcade\artifacts\bin\Microsoft.DotNet.ApiCompat\Debug\net472\Microsoft.DotNet.ApiCompat.exe</_ApiCompatPath>
       <_ApiCompatCommand
           Condition="'$(MSBuildRuntimeType)' == 'core'">"$(DotNetTool)" "$(_ApiCompatPath)"</_ApiCompatCommand>
-      <_ApiCompatCommand
-          Condition="'$(MSBuildRuntimeType)' != 'core' and '$(OS)' == 'Windows_NT'">"$(_ApiCompatPath)"</_ApiCompatCommand>
+      <_ApiCompatCommand Condition="'$(MSBuildRuntimeType)' != 'core'">"$(_ApiCompatPath)"</_ApiCompatCommand>
     </PropertyGroup>
     <ItemGroup>
       <ResolvedMatchingContract Include="@(ReferenceProjectMetadata)" />
