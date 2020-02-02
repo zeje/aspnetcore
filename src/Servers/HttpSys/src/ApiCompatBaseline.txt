@@ -1,5 +1,1 @@
-Compat issues with assembly Microsoft.AspNetCore.Server.HttpSys:
-MembersMustExist : Member 'Microsoft.AspNetCore.HttpSys.Internal.HeapAllocHandle..ctor()' does not exist in the implementation but it does exist in the contract.
-MembersMustExist : Member 'Microsoft.AspNetCore.Server.HttpSys.HttpRequestQueueV2Handle..ctor()' does not exist in the implementation but it does exist in the contract.
-MembersMustExist : Member 'Microsoft.AspNetCore.Server.HttpSys.UrlPrefix..ctor()' does not exist in the implementation but it does exist in the contract.
-Total Issues: 3
+Total Issues: 0

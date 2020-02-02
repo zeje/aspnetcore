@@ -1,4 +1,1 @@
-Compat issues with assembly Microsoft.AspNetCore.Server.IIS:
-MembersMustExist : Member 'Microsoft.AspNetCore.HttpSys.Internal.HeapAllocHandle..ctor()' does not exist in the implementation but it does exist in the contract.
-MembersMustExist : Member 'Microsoft.AspNetCore.Server.IIS.BadHttpRequestException..ctor()' does not exist in the implementation but it does exist in the contract.
-Total Issues: 2
+Total Issues: 0
