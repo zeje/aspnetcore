@@ -9,6 +9,8 @@
 
   <ItemGroup>
     <Reference Include="Ignitor" />
+    <!-- Avoid MSB3277 warning: Package contains DLL with newer assembly version than DLL in NetCore.App.Ref. -->
+    <Reference Include="System.Text.Json" />
   </ItemGroup>
 
   <ItemGroup>

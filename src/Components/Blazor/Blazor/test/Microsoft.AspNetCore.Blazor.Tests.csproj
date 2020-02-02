@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <Reference Include="Microsoft.AspNetCore.Blazor" />
+    <!-- Avoid MSB3277 warning: Package contains DLL with newer assembly version than DLL in NetCore.App.Ref. -->
+    <Reference Include="System.Text.Json" />
     <!-- Avoid CS1705 errors due to mix of assemblies brought in transitively. -->
     <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
