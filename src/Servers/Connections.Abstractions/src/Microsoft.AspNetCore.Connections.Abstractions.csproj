@@ -13,8 +13,10 @@
 
   <ItemGroup>
     <Reference Include="Microsoft.AspNetCore.Http.Features" />
-    <Reference Include="Microsoft.Extensions.ActivatorUtilities.Sources" />
     <Reference Include="System.IO.Pipelines" />
+
+    <Compile Include="$(SharedSourceRoot)src\ActivatorUtilities\*.cs" />
+    <Compile Include="$(SharedSourceRoot)src\ParameterDefaultValue\*.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
