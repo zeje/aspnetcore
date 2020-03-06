@@ -4,6 +4,7 @@ import './appStartup.js';
 import './renderList.js';
 import './jsonHandling.js';
 import './orgChart.js';
+import './navigation.js';
 import { getBlazorDownloadSize } from './blazorDownloadSize.js';
 
 new HtmlUI('E2E Performance', '#display');
