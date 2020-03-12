@@ -109,9 +109,44 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Performance
             _connectionPair.Application.Output.WriteStartStream(streamId: _currentStreamId, _requestHeadersEnumerator, _headersBuffer, endStream: true, frame: _httpFrame);
             await _connectionPair.Application.Output.FlushAsync();
 
+            await ReadResponse();
+
+            _currentStreamId += 2;
+        }
+
+        private async Task ReadResponse()
+        {
             while (true)
             {
-                await ReceiveFrameAsync(_connectionPair.Application.Input, _httpFrame);
+                while (true)
+                {
+                    var result = await _connectionPair.Application.Input.ReadAsync();
+                    var buffer = result.Buffer;
+                    var consumed = buffer.Start;
+                    var examined = buffer.Start;
+
+                    try
+                    {
+                        if (Http2FrameReader.TryReadFrame(ref buffer, _httpFrame, Http2PeerSettings.DefaultMaxFrameSize, out var framePayload))
+                        {
+                            consumed = examined = framePayload.End;
+                            break; ;
+                        }
+                        else
+                        {
+                            examined = buffer.End;
+                        }
+
+                        if (result.IsCompleted)
+                        {
+                            throw new IOException("The reader completed without returning a frame.");
+                        }
+                    }
+                    finally
+                    {
+                        _connectionPair.Application.Input.AdvanceTo(consumed, examined);
+                    }
+                }
 
                 if (_httpFrame.StreamId != _currentStreamId && _httpFrame.StreamId != 0)
                 {
@@ -136,8 +171,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Performance
                     break;
                 }
             }
-
-            _currentStreamId += 2;
         }
 
         internal async ValueTask ReceiveFrameAsync(PipeReader pipeReader, Http2Frame frame, uint maxFrameSize = Http2PeerSettings.DefaultMaxFrameSize)
