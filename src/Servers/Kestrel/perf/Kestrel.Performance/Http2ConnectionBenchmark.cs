@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Pipelines;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using Microsoft.AspNetCore.Http;
@@ -34,18 +35,27 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Performance
         private byte[] _headersBuffer;
         private DuplexPipe.DuplexPipePair _connectionPair;
         private Http2Frame _httpFrame;
-        private string _responseData;
-        private int _dataWritten;
+        private byte[] _requestData;
+        private byte[] _responseData;
+        private int _dataSendWindow;
 
-        [Params(0, 10, 1024 * 1024)]
+        // TODO: There is a bug in how WINDOW_UPDATE is being processed.
+        // Setting this to a large value will cause benchmark to hang.
+        [Params(0, 16384)]
+        public int RequestDataLength { get; set; }
+
+        [Params(0)]
         public int ResponseDataLength { get; set; }
+
+        private bool HasRequestData => RequestDataLength > 0;
 
         [GlobalSetup]
         public void GlobalSetup()
         {
             _memoryPool = SlabMemoryPoolFactory.Create();
             _httpFrame = new Http2Frame();
-            _responseData = new string('!', ResponseDataLength);
+            _responseData = new byte[ResponseDataLength];
+            _requestData = new byte[RequestDataLength];
 
             var options = new PipeOptions(_memoryPool, readerScheduler: PipeScheduler.Inline, writerScheduler: PipeScheduler.Inline, useSynchronizationContext: false);
 
@@ -83,13 +93,27 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Performance
 
             _currentStreamId = 1;
 
-            _ = _connection.ProcessRequestsAsync(new DummyApplication(c => ResponseDataLength == 0 ? Task.CompletedTask : c.Response.WriteAsync(_responseData), new MockHttpContextFactory()));
+            _ = _connection.ProcessRequestsAsync(new DummyApplication(async c =>
+            {
+                if (HasRequestData)
+                {
+                    ReadResult result;
+                    do
+                    {
+                        result = await c.Request.BodyReader.ReadAsync();
+                        c.Request.BodyReader.AdvanceTo(result.Buffer.End);
+                    }
+                    while (!result.IsCompleted);
+                }
+
+                if (ResponseDataLength > 0)
+                {
+                    await c.Response.BodyWriter.WriteAsync(_responseData);
+                }
+            }, new MockHttpContextFactory()));
 
             _connectionPair.Application.Output.Write(Http2Connection.ClientPreface);
-            _connectionPair.Application.Output.WriteSettings(new Http2PeerSettings
-            {
-                InitialWindowSize = 2147483647
-            });
+            _connectionPair.Application.Output.WriteSettings(new Http2PeerSettings());
             _connectionPair.Application.Output.FlushAsync().GetAwaiter().GetResult();
 
             // Read past connection setup frames
@@ -101,14 +125,11 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Performance
             Debug.Assert(_httpFrame.Type == Http2FrameType.SETTINGS);
         }
 
-        [Benchmark]
-        public async Task EmptyRequest()
+        private async Task ReadResponse()
         {
-            _requestHeadersEnumerator.Initialize(_httpRequestHeaders);
-            _requestHeadersEnumerator.MoveNext();
-            _connectionPair.Application.Output.WriteStartStream(streamId: _currentStreamId, _requestHeadersEnumerator, _headersBuffer, endStream: true, frame: _httpFrame);
-            await _connectionPair.Application.Output.FlushAsync();
+            _dataSendWindow = (int)Http2PeerSettings.DefaultInitialWindowSize;
 
+            var dataRead = 0;
             while (true)
             {
                 await ReceiveFrameAsync(_connectionPair.Application.Input, _httpFrame);
@@ -120,15 +141,23 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Performance
 
                 if (_httpFrame.Type == Http2FrameType.DATA)
                 {
-                    _dataWritten += _httpFrame.DataPayloadLength;
+                    dataRead += _httpFrame.DataPayloadLength;
                 }
 
-                if (_dataWritten > 1024 * 32)
+                if (_httpFrame.Type == Http2FrameType.WINDOW_UPDATE)
                 {
-                    _connectionPair.Application.Output.WriteWindowUpdateAsync(streamId: 0, _dataWritten, _httpFrame);
+                    if (_httpFrame.StreamId == _currentStreamId)
+                    {
+                        Interlocked.Add(ref _dataSendWindow, _httpFrame.WindowUpdateSizeIncrement);
+                    }
+                }
+
+                if (dataRead > 1024 * 32)
+                {
+                    _connectionPair.Application.Output.WriteWindowUpdateAsync(streamId: 0, dataRead, _httpFrame);
                     await _connectionPair.Application.Output.FlushAsync();
 
-                    _dataWritten = 0;
+                    dataRead = 0;
                 }
 
                 if ((_httpFrame.HeadersFlags & Http2HeadersFrameFlags.END_STREAM) == Http2HeadersFrameFlags.END_STREAM)
@@ -136,6 +165,41 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Performance
                     break;
                 }
             }
+        }
+
+        [Benchmark]
+        public async Task EmptyRequest()
+        {
+            var responseTask = ReadResponse();
+
+            _requestHeadersEnumerator.Initialize(_httpRequestHeaders);
+            _requestHeadersEnumerator.MoveNext();
+
+            _connectionPair.Application.Output.WriteStartStream(streamId: _currentStreamId, _requestHeadersEnumerator, _headersBuffer, endStream: !HasRequestData, frame: _httpFrame);
+            if (HasRequestData)
+            {
+                var remainingData = _requestData.AsMemory();
+                while (remainingData.Length > 0)
+                {
+                    var length = Math.Min(Math.Min(remainingData.Length, (int)Http2PeerSettings.DefaultMaxFrameSize), _dataSendWindow);
+                    if (length > 0)
+                    {
+                        var endStream = remainingData.Length == length;
+                        _connectionPair.Application.Output.WriteData(streamId: _currentStreamId, _requestData.AsMemory(0, length), endStream, _httpFrame);
+                        remainingData = remainingData.Slice(length);
+
+                        Interlocked.Add(ref _dataSendWindow, -length);
+
+                        await _connectionPair.Application.Output.FlushAsync();
+                    }
+                }
+            }
+            else
+            {
+                await _connectionPair.Application.Output.FlushAsync();
+            }
+
+            await responseTask;
 
             _currentStreamId += 2;
         }
