@@ -66,7 +66,7 @@ namespace Templates.Test.Helpers
         internal static void EnsureDevelopmentCertificates()
         {
             var now = DateTimeOffset.Now;
-            new CertificateManager().EnsureAspNetCoreHttpsDevelopmentCertificate(now, now.AddYears(1));
+            CertificateManager.Instance.EnsureAspNetCoreHttpsDevelopmentCertificate(now, now.AddYears(1));
         }
 
         public void VisitInBrowser(IWebDriver driver)
