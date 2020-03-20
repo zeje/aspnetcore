@@ -1,6 +1,5 @@
 
 using System;
-using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -35,7 +34,7 @@ namespace Microsoft.AspNetCore.Certificates.Generation
             "On macOS or Windows, use 'dotnet dev-certs https --trust' to trust the new certificate.";
 
         public const string KeyNotAccessibleWithoutUserInteraction =
-            "Kestrel is trying to access the ASP.NET Core developer certificate key. " +
+            "The application is trying to access the ASP.NET Core developer certificate key. " +
             "A prompt might appear to ask for permission to access the key. " +
             "When that happens, select 'Always Allow' to grant 'dotnet' access to the certificate key in the future.";
 

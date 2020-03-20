@@ -157,17 +157,17 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
 
                     if (DefaultCertificate != null)
                     {
-                        var (result, message) = CertificateManager.Instance.CheckCertificateState(DefaultCertificate, interactive: false);
-                        if (!result)
+                        var status = CertificateManager.Instance.CheckCertificateState(DefaultCertificate, interactive: false);
+                        if (!status.Result)
                         {
                             // Display a warning indicating to the user that a prompt might appear and provide instructions on what to do in that
                             // case. The underlying implementation of this check is specific to Mac OS and is handled within CheckCertificateState.
-                            logger.DeveloperCertificateFirstRun(message);
+                            logger.DeveloperCertificateFirstRun(status.Message);
 
                             // Now that we've displayed a warning in the logs so that the user gets a notification that a prompt might appear, try
                             // and access the certificate key, which might trigger a prompt.
-                            (result, message) = CertificateManager.Instance.CheckCertificateState(DefaultCertificate, interactive: true);
-                            if (!result)
+                            status = CertificateManager.Instance.CheckCertificateState(DefaultCertificate, interactive: true);
+                            if (!status.Result)
                             {
                                 logger.BadDeveloperCertificateState();
                             }

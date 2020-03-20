@@ -70,48 +70,46 @@ namespace Microsoft.AspNetCore.Certificates.Generation
             var certificates = new List<X509Certificate2>();
             try
             {
-                using (var store = new X509Store(storeName, location))
+                using var store = new X509Store(storeName, location);
+                store.Open(OpenFlags.ReadOnly);
+                certificates.AddRange(store.Certificates.OfType<X509Certificate2>());
+                IEnumerable<X509Certificate2> matchingCertificates = certificates;
+                matchingCertificates = matchingCertificates
+                    .Where(c => HasOid(c, AspNetHttpsOid));
+
+                Log.DescribeFoundCertificates(ToCertificateDescription(matchingCertificates));
+
+                if (isValid)
                 {
-                    store.Open(OpenFlags.ReadOnly);
-                    certificates.AddRange(store.Certificates.OfType<X509Certificate2>());
-                    IEnumerable<X509Certificate2> matchingCertificates = certificates;
-                    matchingCertificates = matchingCertificates
-                        .Where(c => HasOid(c, AspNetHttpsOid));
+                    // Ensure the certificate hasn't expired, has a private key and its exportable
+                    // (for container/unix scenarios).
+                    Log.CheckCertificatesValidity();
+                    var now = DateTimeOffset.Now;
+                    var validCertificates = matchingCertificates
+                        .Where(c => c.NotBefore <= now &&
+                            now <= c.NotAfter &&
+                            (!requireExportable || IsExportable(c))
+                            && MatchesVersion(c))
+                        .ToArray();
 
-                    Log.DescribeFoundCertificates(ToCertificateDescription(matchingCertificates));
+                    var invalidCertificates = matchingCertificates.Except(validCertificates);
 
-                    if (isValid)
-                    {
-                        // Ensure the certificate hasn't expired, has a private key and its exportable
-                        // (for container/unix scenarios).
-                        Log.CheckCertificatesValidity();
-                        var now = DateTimeOffset.Now;
-                        var validCertificates = matchingCertificates
-                            .Where(c => c.NotBefore <= now &&
-                                now <= c.NotAfter &&
-                                (!requireExportable || IsExportable(c))
-                                && MatchesVersion(c))
-                            .ToArray();
+                    Log.DescribeValidCertificates(ToCertificateDescription(validCertificates));
+                    Log.DescribeInvalidValidCertificates(ToCertificateDescription(invalidCertificates));
 
-                        var invalidCertificates = matchingCertificates.Except(validCertificates);
-
-                        Log.DescribeValidCertificates(ToCertificateDescription(validCertificates));
-                        Log.DescribeInvalidValidCertificates(ToCertificateDescription(invalidCertificates));
-
-                        matchingCertificates = validCertificates;
-                    }
-
-                    // We need to enumerate the certificates early to prevent disposing issues.
-                    matchingCertificates = matchingCertificates.ToList();
-
-                    var certificatesToDispose = certificates.Except(matchingCertificates);
-                    DisposeCertificates(certificatesToDispose);
-
-                    store.Close();
-
-                    Log.ListCertificatesEnd();
-                    return (IList<X509Certificate2>)matchingCertificates;
+                    matchingCertificates = validCertificates;
                 }
+
+                // We need to enumerate the certificates early to prevent disposing issues.
+                matchingCertificates = matchingCertificates.ToList();
+
+                var certificatesToDispose = certificates.Except(matchingCertificates);
+                DisposeCertificates(certificatesToDispose);
+
+                store.Close();
+
+                Log.ListCertificatesEnd();
+                return (IList<X509Certificate2>)matchingCertificates;
             }
             catch (Exception e)
             {
@@ -174,6 +172,7 @@ namespace Microsoft.AspNetCore.Certificates.Generation
             if (certificates.Any())
             {
                 certificate = certificates.First();
+                var failedToFixCertificateState = false;
                 if (isInteractive)
                 {
                     // Skip this step if the command is not interactive,
@@ -193,12 +192,16 @@ namespace Microsoft.AspNetCore.Certificates.Generation
                             {
                                 Log.CorrectCertificateStateError(e.ToString());
                                 result = EnsureCertificateResult.FailedToMakeKeyAccessible;
-                                return result;
+                                // We don't return early on this type of failure to allow for tooling to
+                                // export or trust the certificate even in this situation, as that enables
+                                // exporting the certificate to perform any necessary fix with native tooling.
+                                failedToFixCertificateState = true;
                             }
                         }
                     }
                 }
-                else
+
+                if (!failedToFixCertificateState)
                 {
                     Log.ValidCertificatesFound(ToCertificateDescription(certificates));
                     certificate = certificates.First();
@@ -244,8 +247,10 @@ namespace Microsoft.AspNetCore.Certificates.Generation
                     catch (Exception e)
                     {
                         Log.CorrectCertificateStateError(e.ToString());
+                        // We don't return early on this type of failure to allow for tooling to
+                        // export or trust the certificate even in this situation, as that enables
+                        // exporting the certificate to perform any necessary fix with native tooling.
                         result = EnsureCertificateResult.FailedToMakeKeyAccessible;
-                        return result;
                     }
                 }
             }
@@ -259,7 +264,11 @@ namespace Microsoft.AspNetCore.Certificates.Generation
                 catch (Exception e)
                 {
                     Log.ExportCertificateError(e.ToString());
-                    result = EnsureCertificateResult.ErrorExportingTheCertificate;
+                    // We don't want to mask the original source of the error here.
+                    result = result != EnsureCertificateResult.Succeeded || result != EnsureCertificateResult.ValidCertificatePresent ?
+                        result :
+                        EnsureCertificateResult.ErrorExportingTheCertificate;
+
                     return result;
                 }
             }
@@ -750,12 +759,6 @@ namespace Microsoft.AspNetCore.Certificates.Generation
             {
                 Result = result;
                 Message = message;
-            }
-
-            public void Deconstruct(out bool result, out string message)
-            {
-                result = Result;
-                message = Message;
             }
         }
 
