@@ -15,8 +15,8 @@ namespace Microsoft.AspNetCore.Certificates.Generation
 {
     internal abstract class CertificateManager
     {
-        public const string AspNetHttpsOid = "1.3.6.1.4.1.311.84.1.1";
-        public const string AspNetHttpsOidFriendlyName = "ASP.NET Core HTTPS development certificate";
+        internal const string AspNetHttpsOid = "1.3.6.1.4.1.311.84.1.1";
+        internal const string AspNetHttpsOidFriendlyName = "ASP.NET Core HTTPS development certificate";
 
         private const string ServerAuthenticationEnhancedKeyUsageOid = "1.3.6.1.5.5.7.3.1";
         private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName = "Server Authentication";
