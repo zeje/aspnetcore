@@ -21,8 +21,8 @@ namespace Microsoft.AspNetCore.Certificates.Generation
         private const string ServerAuthenticationEnhancedKeyUsageOid = "1.3.6.1.5.5.7.3.1";
         private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName = "Server Authentication";
 
-        internal const string LocalhostHttpsDnsName = "localhost";
-        internal const string LocalhostHttpsDistinguishedName = "CN=" + LocalhostHttpsDnsName;
+        private const string LocalhostHttpsDnsName = "localhost";
+        private const string LocalhostHttpsDistinguishedName = "CN=" + LocalhostHttpsDnsName;
 
         public const int RSAMinimumKeySizeInBits = 2048;
 
