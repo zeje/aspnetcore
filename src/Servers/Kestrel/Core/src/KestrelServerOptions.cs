@@ -162,6 +162,8 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
                         {
                             // Display a warning indicating to the user that a prompt might appear and provide instructions on what to do in that
                             // case. The underlying implementation of this check is specific to Mac OS and is handled within CheckCertificateState.
+                            // Kestrel must NEVER cause a UI prompt on a production system. We only attempt this here because Mac OS is not supported
+                            // in production.
                             logger.DeveloperCertificateFirstRun(status.Message);
 
                             // Now that we've displayed a warning in the logs so that the user gets a notification that a prompt might appear, try
