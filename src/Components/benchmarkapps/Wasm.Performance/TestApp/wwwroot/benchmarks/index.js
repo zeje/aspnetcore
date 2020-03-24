@@ -8,7 +8,7 @@ import { getBlazorDownloadSize } from './blazorDownloadSize.js';
 
 new HtmlUI('E2E Performance', '#display');
 
-if (location.href.indexOf('#automated') !== -1) {
+if (location.href.indexOf('#perf') !== -1) {
   (async function() {
     const query = new URLSearchParams(window.location.search);
     const group = query.get('group');

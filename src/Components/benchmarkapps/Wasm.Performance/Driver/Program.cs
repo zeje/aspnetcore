@@ -59,6 +59,8 @@ namespace Wasm.Performance.Driver
             var receiverUrl = GetListeningUrl(benchmarkReceiver);
             Console.WriteLine($"Test app listening at {testAppUrl}.");
 
+            var runType = isStressRun ? "stress" : "perf";
+
             var firstRun = true;
             do
             {
@@ -69,13 +71,9 @@ namespace Wasm.Performance.Driver
 
                 if (firstRun)
                 {
-                    var launchUrl = $"{testAppUrl}?resultsUrl={UrlEncoder.Default.Encode(receiverUrl)}#automated";
+                    var launchUrl = $"{testAppUrl}?resultsUrl={UrlEncoder.Default.Encode(receiverUrl)}#{runType}";
                     browser.Url = launchUrl;
                     browser.Navigate();
-                }
-                else
-                {
-                    browser.FindElementById("runAll").Click();
                 }
 
                 var results = await BenchmarkResultTask.Task;
