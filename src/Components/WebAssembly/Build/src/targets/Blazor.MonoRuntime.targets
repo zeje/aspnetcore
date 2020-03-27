@@ -108,9 +108,9 @@
 
       <_BlazorOutputWithTargetPath Include="@(_BlazorResolvedAssembly)">
         <BootManifestResourceType Condition="'%(Extension)' == '.dll'">assembly</BootManifestResourceType>
-        <BootManifestResourceType Condition="'%(_BlazorCopyLocalPaths.Extension)' == '.pdb'">pdb</BootManifestResourceType>
-        <BootManifestResourceName>%(_BlazorCopyLocalPaths.DestinationSubDirectory)%(FileName)%(Extension)</BootManifestResourceName>
-        <TargetOutputPath>$(_BlazorRuntimeBinOutputPath)%(_BlazorCopyLocalPaths.DestinationSubDirectory)%(FileName)%(Extension)</TargetOutputPath>
+        <BootManifestResourceType Condition="'%(Extension)' == '.pdb'">pdb</BootManifestResourceType>
+        <BootManifestResourceName>%(FileName)%(Extension)</BootManifestResourceName>
+        <TargetOutputPath>$(_BlazorRuntimeBinOutputPath)%(FileName)%(Extension)</TargetOutputPath>
       </_BlazorOutputWithTargetPath>
 
       <_BlazorOutputWithTargetPath Include="@(_DotNetWasmRuntimeFile)">
