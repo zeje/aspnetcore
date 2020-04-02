@@ -93,10 +93,13 @@ namespace RunTests
             Console.WriteLine("Checking for Microsoft.AspNetCore.App/");
             if (Directory.Exists("Microsoft.AspNetCore.App"))
             {
-                Console.WriteLine($"Found Microsoft.AspNetCore.App/, copying to {dotnetRoot}/shared/Microsoft.AspNetCore.App/{runtimeVersion}");
+                var aspnetRuntimePath = $"{dotnetRoot}/shared/Microsoft.AspNetCore.App/{runtimeVersion}";
+                Console.WriteLine($"Set ASPNET_RUNTIME_PATH: {aspnetRuntimePath}");
+                environmentVariables.Add("ASPNET_RUNTIME_PATH", aspnetRuntimePath);
+                Console.WriteLine($"Found Microsoft.AspNetCore.App/, copying to {aspnetRuntimePath}");
                 foreach (var file in Directory.EnumerateFiles("Microsoft.AspNetCore.App", "*.*", SearchOption.AllDirectories))
                 {
-                    File.Copy(file, $"{dotnetRoot}/shared/Microsoft.AspNetCore.App/{runtimeVersion}", overwrite: true);
+                    File.Copy(file, aspnetRuntimePath, overwrite: true);
                 }
 
                 Console.WriteLine($"Adding current directory to nuget sources: {HELIX_WORKITEM_ROOT}");
