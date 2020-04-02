@@ -102,6 +102,13 @@ namespace RunTests
                     File.Copy(file, aspnetRuntimePath, overwrite: true);
                 }
 
+                Console.WriteLine();
+                Console.WriteLine($"Displaying {aspnetRuntimePath} contents:");
+                foreach (var file in Directory.EnumerateFiles(aspnetRuntimePath))
+                {
+                    Console.WriteLine(Path.GetFileName(file));
+                }
+                
                 Console.WriteLine($"Adding current directory to nuget sources: {HELIX_WORKITEM_ROOT}");
 
                 await ProcessUtil.RunAsync($"{dotnetRoot}/dotnet",
